@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Where Did You Park?</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Parking">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #1a1a2e;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      gap: 16px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 28px;
+      padding: 48px 64px;
+      text-align: center;
+      max-width: 340px;
+      width: 90%;
+    }
+    .icon { font-size: 48px; margin-bottom: 12px; }
+    .title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #888;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: #bbb;
+      margin-bottom: 28px;
+    }
+    .number {
+      font-size: 120px;
+      font-weight: 800;
+      color: #111;
+      line-height: 1;
+    }
+    .save-btn {
+      display: none;
+      background: #fff;
+      color: #1a1a2e;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 28px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 90%;
+      max-width: 340px;
+    }
+    .ios-hint {
+      display: none;
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      text-align: center;
+      max-width: 280px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🅿️</div>
+    <div class="title">Where Did You Park?</div>
+    <div class="subtitle">You parked on floor</div>
+    <div class="number" id="num">6</div>
+  </div>
+
+  <!-- Android: shown when installable -->
+  <button class="save-btn" id="installBtn">⬇️ Save to Home Screen</button>
+
+  <!-- iOS: shown always on Safari mobile -->
+  <p class="ios-hint" id="iosHint">Tap the <strong>Share</strong> button below, then <strong>"Add to Home Screen"</strong> to save this floor.</p>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const n = params.get('n');
+    const type = params.get('type');
+    if (n) document.getElementById('num').textContent = n;
+    if (type === 'zone') {
+      document.querySelector('.subtitle').textContent = 'You parked in zone';
+    }
+
+    // Android / Chrome install prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('installBtn').style.display = 'block';
+    });
+    document.getElementById('installBtn').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        document.getElementById('installBtn').style.display = 'none';
+      }
+    });
+
+    // iOS Safari hint
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone;
+    if (isIOS && !isStandalone) {
+      document.getElementById('iosHint').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
