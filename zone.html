@@ -81,34 +81,10 @@
     <div class="number" id="num">A6</div>
   </div>
 
-  <button class="save-btn" id="installBtn">⬇️ Save to Home Screen</button>
-  <p class="ios-hint" id="iosHint">Tap the <strong>Share</strong> button below, then <strong>"Add to Home Screen"</strong> to save this zone.</p>
-
   <script>
     const params = new URLSearchParams(window.location.search);
     const n = params.get('n');
     if (n) document.getElementById('num').textContent = n;
-
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById('installBtn').style.display = 'block';
-    });
-    document.getElementById('installBtn').addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        document.getElementById('installBtn').style.display = 'none';
-      }
-    });
-
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    const isStandalone = window.navigator.standalone;
-    if (isIOS && !isStandalone) {
-      document.getElementById('iosHint').style.display = 'block';
-    }
   </script>
 </body>
 </html>
